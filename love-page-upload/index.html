@@ -389,6 +389,43 @@ section.active {
   transition: transform 0.2s;
 }
 .timeline-img:hover { transform: scale(1.05); }
+.timeline-media {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(255,107,157,0.2);
+  cursor: pointer;
+  background: linear-gradient(135deg, rgba(255,107,157,0.22), rgba(196,77,255,0.22));
+  transition: transform 0.2s;
+}
+.timeline-media:hover { transform: scale(1.05); }
+.timeline-media img,
+.timeline-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.media-play-badge {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(0,0,0,0.15), rgba(0,0,0,0.45));
+}
+.media-play-badge::before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  border-left: 17px solid rgba(255,255,255,0.92);
+  margin-left: 4px;
+  filter: drop-shadow(0 0 10px rgba(255,107,157,0.75));
+}
 
 /* 图片灯箱 */
 .lightbox {
@@ -402,11 +439,16 @@ section.active {
   padding: 20px;
 }
 .lightbox.show { display: flex; }
-.lightbox img {
+.lightbox img,
+.lightbox video {
   max-width: 90vw;
   max-height: 90vh;
   border-radius: 12px;
   object-fit: contain;
+}
+.lightbox video {
+  width: min(90vw, 900px);
+  background: #000;
 }
 .lightbox-close {
   position: absolute;
@@ -863,7 +905,17 @@ section.active {
   object-fit: cover;
   transition: transform 0.6s ease;
 }
+.detail-gallery-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
 .detail-gallery-item:hover img {
+  transform: scale(1.1);
+}
+.detail-gallery-item:hover video {
   transform: scale(1.1);
 }
 .detail-gallery-item::after {
@@ -1035,6 +1087,7 @@ section.active {
 <div class="lightbox" id="lightbox">
   <button class="lightbox-close" id="lightboxClose">×</button>
   <img id="lightboxImg" src="" alt="">
+  <video id="lightboxVideo" controls playsinline preload="metadata" style="display:none"></video>
 </div>
 
 <!-- 编辑入口（悬浮按钮，编辑模式激活后显示） -->
@@ -1085,17 +1138,75 @@ const CONFIG = {
   } catch(e) {}
 })();
 
+function escapeAttr(value) {
+  return String(value ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function escapeJsString(value) {
+  return String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '');
+}
+
+function isVideoMedia(media) {
+  const src = typeof media === 'string' ? media : (media && media.src) || '';
+  const type = typeof media === 'object' && media ? media.type : '';
+  return type === 'video' || /^data:video\//i.test(src) || /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src);
+}
+
+function normalizeMedia(media) {
+  if (typeof media === 'string') {
+    return { type: isVideoMedia(media) ? 'video' : 'image', src: media, poster: '' };
+  }
+  const src = media && media.src ? media.src : '';
+  return {
+    type: media && media.type ? media.type : (isVideoMedia(src) ? 'video' : 'image'),
+    src,
+    poster: media && media.poster ? media.poster : '',
+    title: media && media.title ? media.title : ''
+  };
+}
+
+function getItemMedia(item) {
+  return (item.media || item.imgs || []).map(normalizeMedia).filter(media => media.src);
+}
+
+function ensureMediaList(item) {
+  if (!item.media) item.media = getItemMedia(item);
+  return item.media;
+}
+
+function getMediaPoster(media) {
+  return media.type === 'video' ? media.poster : media.src;
+}
+
+function renderMediaThumb(media, title, className = 'timeline-media') {
+  const src = escapeAttr(media.src);
+  const poster = escapeAttr(getMediaPoster(media));
+  const alt = escapeAttr(media.title || title || '');
+  const safeSrc = escapeJsString(media.src);
+  const safePoster = escapeJsString(media.poster || '');
+  if (media.type === 'video') {
+    const preview = poster
+      ? `<img loading="lazy" src="${poster}" alt="${alt}" onerror="this.style.display='none'">`
+      : `<video muted playsinline preload="metadata" src="${src}#t=0.1"></video>`;
+    return `<div class="${className}" onclick="openLightbox('${safeSrc}', 'video', '${safePoster}')">${preview}<span class="media-play-badge"></span></div>`;
+  }
+  return `<div class="${className}" onclick="openLightbox('${safeSrc}', 'image')"><img loading="lazy" src="${src}" alt="${alt}" onerror="this.parentElement.style.display='none'"></div>`;
+}
+
 // ========== 渲染内容 ==========
 function renderTimeline() {
   const el = document.getElementById('timeline');
-  el.innerHTML = CONFIG.timeline.map(item => `
-    <div class="timeline-item">
-      <div class="timeline-date">${item.date}</div>
-      <div class="timeline-title">${item.title}</div>
-      <div class="timeline-desc">${item.desc}</div>
-      ${item.imgs && item.imgs.length ? `<div class="timeline-imgs">${item.imgs.map(src => `<img class="timeline-img" loading="lazy" src="${src}" alt="${item.title}" onclick="openLightbox(this.src)" onerror="this.style.display='none'">`).join('')}</div>` : ''}
-    </div>
-  `).join('');
+  el.innerHTML = CONFIG.timeline.map(item => {
+    const mediaItems = getItemMedia(item);
+    return `
+      <div class="timeline-item">
+        <div class="timeline-date">${item.date}</div>
+        <div class="timeline-title">${item.title}</div>
+        <div class="timeline-desc">${item.desc}</div>
+        ${mediaItems.length ? `<div class="timeline-imgs">${mediaItems.map(media => renderMediaThumb(media, item.title)).join('')}</div>` : ''}
+      </div>
+    `;
+  }).join('');
 }
 
 function renderBlessing() {
@@ -1486,17 +1597,45 @@ function initHeartBurst() {
 }
 
 // ========== 图片灯箱 ==========
-function openLightbox(src) {
+function closeLightbox() {
   const lb = document.getElementById('lightbox');
-  document.getElementById('lightboxImg').src = src;
+  const img = document.getElementById('lightboxImg');
+  const video = document.getElementById('lightboxVideo');
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+  video.style.display = 'none';
+  img.removeAttribute('src');
+  img.style.display = '';
+  lb.classList.remove('show');
+}
+
+function openLightbox(src, type = 'image', poster = '') {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightboxImg');
+  const video = document.getElementById('lightboxVideo');
+  video.pause();
+  video.removeAttribute('src');
+  video.removeAttribute('poster');
+  if (type === 'video' || isVideoMedia(src)) {
+    img.style.display = 'none';
+    video.src = src;
+    if (poster) video.poster = poster;
+    video.style.display = '';
+    video.load();
+  } else {
+    video.style.display = 'none';
+    img.src = src;
+    img.style.display = '';
+  }
   lb.classList.add('show');
 }
 (function() {
   document.getElementById('lightboxClose').addEventListener('click', () => {
-    document.getElementById('lightbox').classList.remove('show');
+    closeLightbox();
   });
   document.getElementById('lightbox').addEventListener('click', e => {
-    if (e.target === e.currentTarget) document.getElementById('lightbox').classList.remove('show');
+    if (e.target === e.currentTarget) closeLightbox();
   });
 })();
 
@@ -1556,7 +1695,7 @@ function initEditor() {
   });
 
   document.getElementById('editAdd').addEventListener('click', () => {
-    CONFIG.timeline.push({ date: '', title: '', desc: '', imgs: [] });
+    CONFIG.timeline.push({ date: '', title: '', desc: '', media: [] });
     renderEditPanel();
     renderTimeline();
     initScrollAnimations();
@@ -1577,9 +1716,9 @@ function initEditor() {
         <textarea class="ei-desc" placeholder="描述">${item.desc}</textarea>
         <label>图片</label>
         <div class="edit-imgs-preview">
-          ${(item.imgs || []).map((src, j) => `
+          ${getItemMedia(item).map((media, j) => `
             <div class="edit-img-del">
-              <img src="${src}">
+              ${media.type === 'video' ? renderMediaThumb(media, item.title) : `<img src="${escapeAttr(media.src)}">`}
               <button data-del-img="${j}">×</button>
             </div>
           `).join('')}
@@ -1590,6 +1729,7 @@ function initEditor() {
           <label class="edit-btn edit-btn-ghost" style="cursor:pointer">
             上传图片<input type="file" accept="image/*" multiple style="display:none" class="ei-upload">
           </label>
+          <button class="edit-btn edit-btn-ghost" data-add-video="${i}">添加视频路径</button>
           <button class="edit-btn edit-btn-danger" data-del-item="${i}">删除节点</button>
         </div>
       </div>
@@ -1606,9 +1746,17 @@ function initEditor() {
         const files = Array.from(e.target.files);
         let loaded = 0;
         files.forEach(file => {
+          if (!file.type.startsWith('image/')) {
+            alert('视频请先放到 videos/ 文件夹，再用“添加视频路径”填写相对路径，避免把 HTML 文件撑大。');
+            return;
+          }
           const reader = new FileReader();
           reader.onload = ev => {
-            CONFIG.timeline[i].imgs.push(ev.target.result);
+            ensureMediaList(CONFIG.timeline[i]).push({
+              type: 'image',
+              src: ev.target.result,
+              poster: ''
+            });
             loaded++;
             if (loaded === files.length) { renderEditPanel(); renderTimeline(); initScrollAnimations(); }
           };
@@ -1616,9 +1764,18 @@ function initEditor() {
         });
       });
 
+      const addVideoBtn = el.querySelector('[data-add-video]');
+      if (addVideoBtn) addVideoBtn.addEventListener('click', () => {
+        const src = prompt('填写视频相对路径，例如 videos/05.20.mp4');
+        if (!src) return;
+        const poster = prompt('可选：填写视频封面图路径，例如 photos/05.20.poster.jpg') || '';
+        ensureMediaList(CONFIG.timeline[i]).push({ type: 'video', src: src.trim(), poster: poster.trim() });
+        renderEditPanel(); renderTimeline(); initScrollAnimations();
+      });
+
       el.querySelectorAll('[data-del-img]').forEach(btn => {
         btn.addEventListener('click', () => {
-          CONFIG.timeline[i].imgs.splice(+btn.dataset.delImg, 1);
+          ensureMediaList(CONFIG.timeline[i]).splice(+btn.dataset.delImg, 1);
           renderEditPanel(); renderTimeline(); initScrollAnimations();
         });
       });
@@ -1665,8 +1822,8 @@ function initEditor() {
     let html = document.documentElement.outerHTML;
     // 替换 CONFIG.timeline 部分
     const timelineStr = CONFIG.timeline.map(item => {
-      const imgs = JSON.stringify(item.imgs || []);
-      return `    { date: '${item.date}', title: '${item.title}', desc: '${item.desc}', imgs: ${imgs} }`;
+      const media = JSON.stringify(getItemMedia(item));
+      return `    { date: '${item.date}', title: '${item.title}', desc: '${item.desc}', media: ${media} }`;
     }).join(',\n');
     html = html.replace(
       /timeline:\s*\[[\s\S]*?\n\s*\],\s*\n\s*\/\/ 祝福语/,
@@ -1727,8 +1884,10 @@ function openDetailPage(idx) {
   ];
   const [c1, c2, c3] = colors[idx % colors.length];
 
-  const heroImgIdx = (idx === 3 && item.imgs && item.imgs.length > 1) ? 1 : 0;
-  const heroImg = item.imgs && item.imgs.length > 0 ? item.imgs[heroImgIdx] : '';
+  const mediaItems = getItemMedia(item);
+  const heroMediaIdx = (idx === 3 && mediaItems.length > 1) ? 1 : 0;
+  const heroMedia = mediaItems[heroMediaIdx] || mediaItems[0];
+  const heroImg = heroMedia ? getMediaPoster(heroMedia) : '';
 
   const particles = Array.from({length: 20}, (_, i) => {
     const x = Math.random() * 100;
@@ -1738,15 +1897,11 @@ function openDetailPage(idx) {
     return `<div class="detail-particle" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;animation-delay:${delay}s"></div>`;
   }).join('');
 
-  const galleryHtml = item.imgs && item.imgs.length > 0 ? `
+  const galleryHtml = mediaItems.length > 0 ? `
     <div class="detail-gallery">
       <div class="detail-gallery-title">· 回忆相册 ·</div>
       <div class="detail-gallery-grid">
-        ${item.imgs.map(src => `
-          <div class="detail-gallery-item" onclick="openLightbox('${src.replace(/'/g, "\\'")}')">
-            <img loading="lazy" src="${src}" alt="${item.title}" onerror="this.parentElement.style.display='none'">
-          </div>
-        `).join('')}
+        ${mediaItems.map(media => renderMediaThumb(media, item.title, 'detail-gallery-item')).join('')}
       </div>
     </div>
   ` : '';
@@ -1772,7 +1927,7 @@ function openDetailPage(idx) {
         <span class="detail-stat-label">天前的今天</span>
       </div>
       <div class="detail-stat" style="animation-delay:0.4s">
-        <span class="detail-stat-num">${item.imgs ? item.imgs.length : 0}</span>
+        <span class="detail-stat-num">${mediaItems.length}</span>
         <span class="detail-stat-label">张珍贵照片</span>
       </div>
       <div class="detail-stat" style="animation-delay:0.6s">
