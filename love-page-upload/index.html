@@ -615,28 +615,231 @@ section.active {
 
 /* === 我眼中的宁宁 === */
 #ningning {
-  background: linear-gradient(180deg, #16082b 0%, #1a0a2e 100%);
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255,107,157,0.26), transparent 34%),
+    radial-gradient(circle at 82% 8%, rgba(107,197,255,0.18), transparent 30%),
+    radial-gradient(circle at 50% 90%, rgba(196,77,255,0.22), transparent 36%),
+    linear-gradient(180deg, #16082b 0%, #1a0a2e 54%, #0d0518 100%);
   padding-top: 100px;
 }
-.cards {
+#ningning::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.24) 0 1px, transparent 1.5px),
+    linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.05) 45%, transparent 62%);
+  background-size: 42px 42px, 100% 100%;
+  opacity: 0.28;
+  pointer-events: none;
+}
+#ningning::after {
+  content: '';
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  right: -90px;
+  top: 130px;
+  border-radius: 50%;
+  background: conic-gradient(from 120deg, rgba(255,107,157,0.28), rgba(107,197,255,0.2), rgba(196,77,255,0.26), rgba(255,107,157,0.28));
+  filter: blur(24px);
+  opacity: 0.65;
+  animation: orbFloat 9s ease-in-out infinite;
+  pointer-events: none;
+}
+.ningning-hero {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 34px;
+  padding: 0 10px;
+}
+.ningning-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  margin-bottom: 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,230,246,0.86);
+  font-size: 11px;
+  letter-spacing: 3px;
+  backdrop-filter: blur(10px);
+}
+.ningning-lead {
+  margin: -24px auto 20px;
+  max-width: 620px;
+  color: rgba(255,255,255,0.68);
+  font-size: 15px;
+  line-height: 1.9;
+}
+.praise-box {
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  max-width: 500px;
+  align-items: center;
+  gap: 12px;
+}
+.praise-btn {
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 999px;
+  padding: 12px 20px;
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(255,107,157,0.95), rgba(196,77,255,0.9)),
+    rgba(255,255,255,0.08);
+  box-shadow: 0 12px 34px rgba(255,107,157,0.24);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.praise-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 44px rgba(255,107,157,0.34);
+}
+.praise-note {
+  min-height: 46px;
+  max-width: 560px;
+  padding: 12px 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,244,250,0.9);
+  line-height: 1.7;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.cards {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 26px;
+  max-width: 980px;
   width: 100%;
 }
+.card:nth-child(even) {
+  margin-top: 44px;
+}
+.card:nth-child(2) {
+  --tag-a: #ff9f6e;
+  --tag-b: #ff6bcb;
+  --tag-c: #ffe08a;
+  --tag-d: #ff4d8d;
+  --tag-e: #ffcf5a;
+  --tag-f: #ff7ad9;
+}
+.card:nth-child(3) {
+  --tag-a: #6bc5ff;
+  --tag-b: #8a7cff;
+  --tag-c: #9effd0;
+  --tag-d: #3ee7ff;
+  --tag-e: #5d7cff;
+  --tag-f: #54ffb4;
+}
+.card:nth-child(4) {
+  --tag-a: #c44dff;
+  --tag-b: #59f1d6;
+  --tag-c: #ffb3d9;
+  --tag-d: #b44dff;
+  --tag-e: #42f5d7;
+  --tag-f: #ff6bea;
+}
 .card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,107,157,0.15);
+  --mx: 50%;
+  --my: 50%;
+  --tag-a: #ff6b9d;
+  --tag-b: #6bc5ff;
+  --tag-c: #ffd166;
+  --tag-d: #ff4d8d;
+  --tag-e: #ffcf5a;
+  --tag-f: #61ffca;
+  position: relative;
+  background: rgba(15, 8, 30, 0.85);
+  border: none;
   border-radius: 16px;
   padding: 24px;
+  min-height: 390px;
   opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.6s ease;
+  transform: translateY(30px) perspective(800px) rotateX(0deg) rotateY(0deg);
+  transition: opacity 0.6s ease, transform 0.4s ease, box-shadow 0.4s ease;
+  overflow: hidden;
+}
+.card::marker { display: none; }
+.card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 17px;
+  background: conic-gradient(from var(--border-angle, 0deg), #ff6b9d, #c44dff, #6bc5ff, #ff6b9d, #c44dff, #ff6b9d);
+  animation: rotateBorder 4s linear infinite;
+  animation-delay: var(--shimmer-delay, 0s);
+  opacity: 0.7;
+  transition: opacity 0.4s;
+}
+.card:hover::before {
+  opacity: 1;
+}
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  border-radius: 15px;
+  background: rgba(15, 8, 30, 0.92);
+  pointer-events: none;
+}
+.card .card-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: radial-gradient(circle 200px at var(--mx) var(--my), rgba(255,107,157,0.15), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 2;
+}
+.card:hover .card-glow {
+  opacity: 1;
+}
+.card .card-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 50%, transparent 60%);
+  transform: skewX(-20deg);
+  animation: shimmerSweep 5s ease-in-out infinite;
+  animation-delay: var(--shimmer-delay, 0s);
+  pointer-events: none;
+  z-index: 2;
+}
+.card:hover {
+  box-shadow:
+    0 0 20px rgba(255,107,157,0.3),
+    0 0 60px rgba(196,77,255,0.15),
+    0 8px 32px rgba(0,0,0,0.4);
 }
 .card.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) perspective(800px) rotateX(0deg) rotateY(0deg);
+}
+@keyframes rotateBorder {
+  to { --border-angle: 360deg; }
+}
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes shimmerSweep {
+  0%, 100% { left: -100%; }
+  50% { left: 200%; }
 }
 .card-title {
   font-size: 18px;
@@ -645,10 +848,59 @@ section.active {
   display: flex;
   align-items: center;
   gap: 8px;
+  position: relative;
+  z-index: 3;
+}
+.card-kicker {
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #fff;
+  overflow: hidden;
+  background: linear-gradient(115deg, var(--tag-a), var(--tag-c), var(--tag-f), var(--tag-b), var(--tag-d), var(--tag-e), var(--tag-a));
+  background-size: 320% 320%;
+  border: 1px solid rgba(255,255,255,0.26);
+  animation: rainbowTag 4.5s linear infinite;
+  box-shadow:
+    0 0 14px rgba(255,107,157,0.42),
+    0 0 26px color-mix(in srgb, var(--tag-b) 34%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.35);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.35);
+  isolation: isolate;
+}
+.card-kicker::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.55) 45%, transparent 70%);
+  transform: translateX(-130%) skewX(-18deg);
+  animation: tagGlint 3.2s ease-in-out infinite;
+  pointer-events: none;
 }
 .card-title::before {
   content: '✦';
   font-size: 14px;
+  animation: twinkle 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(255,107,157,0.6));
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.5; transform: scale(0.7) rotate(20deg); }
+}
+@keyframes rainbowTag {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 320% 50%; }
+}
+@keyframes tagGlint {
+  0%, 45% { transform: translateX(-130%) skewX(-18deg); opacity: 0; }
+  55% { opacity: 0.75; }
+  80%, 100% { transform: translateX(135%) skewX(-18deg); opacity: 0; }
 }
 .card-burst-btn {
   cursor: pointer;
@@ -669,14 +921,63 @@ section.active {
   aspect-ratio: 4/3;
   object-fit: cover;
   background: rgba(255,107,157,0.1);
+  position: relative;
+  z-index: 3;
 }
 .card-desc {
   font-size: 14px;
   color: rgba(255,255,255,0.7);
   line-height: 1.8;
+  position: relative;
+  z-index: 3;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-left: 2px solid rgba(255,107,157,0.74);
+  border-radius: 0 14px 14px 0;
+  background: rgba(255,255,255,0.055);
+}
+@keyframes orbFloat {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-26px, 34px, 0) rotate(18deg); }
+}
+@media (max-width: 760px) {
+  .ningning-hero {
+    margin-bottom: 26px;
+  }
+  .ningning-lead {
+    margin-top: -18px;
+    font-size: 14px;
+  }
+  .cards {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+  }
+  .card:nth-child(even) {
+    margin-top: 0;
+  }
+  .card {
+    min-height: auto;
+  }
 }
 
 /* 底部三栏 */
+@media (prefers-reduced-motion: reduce) {
+  #ningning::after,
+  .card::before,
+  .card .card-shimmer,
+  .card-title::before,
+  .card-kicker,
+  .card-kicker::after {
+    animation: none;
+  }
+  .card .card-shimmer {
+    display: none;
+  }
+  .card {
+    transition: opacity 0.6s ease, box-shadow 0.4s ease;
+  }
+}
+
 .footer-section {
   padding: 60px 20px 20px;
   background: linear-gradient(180deg, #1a0a2e 0%, #0d0518 100%);
@@ -1029,31 +1330,17 @@ section.active {
 
 <!-- 我眼中的宁宁 -->
 <section id="ningning" class="">
-  <h2 class="section-title">我眼中的宁宁</h2>
+  <div class="ningning-hero">
+    <span class="ningning-eyebrow">MY FAVORITE PERSON</span>
+    <h2 class="section-title">我眼中的宁宁</h2>
+    <p class="ningning-lead">不是只有四个形容词，是我在很多个瞬间里，一次又一次确认：你真的很好，很值得被认真喜欢。</p>
+    <div class="praise-box">
+      <button class="praise-btn" id="praiseBtn" type="button">再夸宁宁一次</button>
+      <div class="praise-note" id="praiseNote">点一下，掉落一句只属于宁宁的夸夸。</div>
+    </div>
+  </div>
   <div class="cards" id="cards">
-    <div class="card">
-      <img class="card-img" src="photos/a1.jpg" alt="温柔" onerror="this.style.background='linear-gradient(135deg,rgba(255,107,157,0.2),rgba(196,77,255,0.2))'">
-      <div class="card-title">温柔 <span class="card-burst-btn" onclick="cardBurst(event)">💕</span></div>
-      <div class="card-desc">你的温柔是我见过最美的风景，每次你笑起来，整个世界都亮了。</div>
-    </div>
-
-    <div class="card">
-      <img class="card-img" src="photos/a2.jpg" alt="可爱" onerror="this.style.background='linear-gradient(135deg,rgba(255,107,157,0.2),rgba(196,77,255,0.2))'">
-      <div class="card-title">可爱 <span class="card-burst-btn" onclick="cardBurst(event)">🌸</span></div>
-      <div class="card-desc">你撒娇的样子，你认真的样子，你发呆的样子，每一面都让我心动。</div>
-    </div>
-
-    <div class="card">
-      <img class="card-img" src="photos/a3.jpg" alt="勇敢" onerror="this.style.background='linear-gradient(135deg,rgba(255,107,157,0.2),rgba(196,77,255,0.2))'">
-      <div class="card-title">勇敢 <span class="card-burst-btn" onclick="cardBurst(event)">⭐</span></div>
-      <div class="card-desc">你比自己想象的更勇敢，我一直都为你骄傲。</div>
-    </div>
-
-    <div class="card">
-      <img class="card-img" src="photos/a4.jpg" alt="聪明" onerror="this.style.background='linear-gradient(135deg,rgba(255,107,157,0.2),rgba(196,77,255,0.2))'">
-      <div class="card-title">聪明 <span class="card-burst-btn" onclick="cardBurst(event)">✨</span></div>
-      <div class="card-desc">和你聊天永远不会无聊，你的想法总是让我惊喜。</div>
-    </div>
+    <noscript>请开启 JavaScript，查看我眼中的宁宁。</noscript>
   </div>
 </section>
 
@@ -1219,16 +1506,121 @@ const cardCounts = [0, 0, 0, 0];
 function renderCards() {
   const el = document.getElementById('cards');
   const icons = ['💕','🌸','⭐','✨'];
+  const tags = ['SOFT LIGHT', 'SWEET MOMENT', 'BRAVE HEART', 'BRIGHT MIND'];
   el.innerHTML = CONFIG.cards.map((item, i) => `
-    <div class="card">
+    <div class="card" style="--shimmer-delay:${i * 1.2}s">
+      <span class="card-glow"></span>
+      <span class="card-shimmer"></span>
+      <span class="card-kicker">${item.tag || tags[i] || 'SHINING POINT'}</span>
       <img class="card-img" loading="lazy" src="${item.img}" alt="${item.title}" onerror="this.style.background='linear-gradient(135deg,rgba(255,107,157,0.2),rgba(196,77,255,0.2))'">
       <div class="card-title">${item.title} <span class="card-burst-btn" onclick="cardBurst(event,${i})">${icons[i] || '💕'}</span><span class="card-count" id="card-count-${i}" style="display:none"></span></div>
       <div class="card-desc">${item.desc}</div>
     </div>
   `).join('');
+  initCardInteraction();
+}
+
+function initCardInteraction() {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.card').forEach(card => {
+    let rect = null;
+    let rafId = 0;
+    card.addEventListener('pointerenter', () => {
+      rect = card.getBoundingClientRect();
+    });
+    card.addEventListener('pointermove', e => {
+      if (!rect) return;
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        card.style.setProperty('--mx', x + '%');
+        card.style.setProperty('--my', y + '%');
+        const rotateY = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
+        const rotateX = ((e.clientY - rect.top) / rect.height - 0.5) * -6;
+        card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
+      });
+    });
+    card.addEventListener('pointerleave', () => {
+      rect = null;
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+      card.style.transform = '';
+    });
+  });
 }
 
 // ========== 花瓣 + 星空 + 光晕动画 ==========
+function initPraiseBox() {
+  const btn = document.getElementById('praiseBtn');
+  const note = document.getElementById('praiseNote');
+  if (!btn || !note) return;
+
+  const praises = [
+    '你不是突然闪闪发光的，是我越靠近越发现：你本来就很亮。',
+    '你认真听我说话的时候，我会觉得自己被世界温柔接住了。',
+    '你的小表情、小脾气、小开心，我都觉得可爱得很具体。',
+    '你有一种很珍贵的勇敢：不是不害怕，而是害怕也还愿意往前走。',
+    '我喜欢你的聪明，也喜欢你偶尔笨笨地可爱一下。',
+    '如果生活是一部电影，你出现的镜头一定自带柔光。',
+    '你笑起来的时候，我会突然觉得今天也没那么难。',
+    '你有一种很厉害的魔法：一句话就能让我心软。',
+    '你认真做事的样子特别好看，像小小的光在聚焦。',
+    '你偶尔的小任性，我也觉得是可爱的生命力。',
+    '你不是完美才可爱，是你真实地站在那里就很可爱。',
+    '你会把普通的小事变得很值得记住。',
+    '你眼睛亮起来的时候，我就知道我又要心动一次。',
+    '你身上有一种让人安心的温柔，很轻，但是很珍贵。',
+    '你很会让我的世界突然变甜，甚至不用刻意做什么。',
+    '你撒娇的时候，我的原则会自动变得不太坚定。',
+    '你努力的时候很闪光，休息的时候也值得被好好抱抱。',
+    '你聪明得很灵动，可爱得又很没有防备。',
+    '你不用证明自己很好，我一直都看得见。',
+    '你是那种越了解，越会让人舍不得移开目光的人。',
+    '你的小情绪也很重要，我愿意慢慢听、慢慢哄。',
+    '你让我觉得，喜欢一个人原来可以这么具体。',
+    '你在我这里不是普通女孩子，是特别特别特别的宁宁。',
+    '你的一句晚安，能把我的一天轻轻收好。',
+    '你有时候笨笨的，但笨得很有杀伤力。',
+    '我喜欢你发光，也喜欢你累了的时候可以不用发光。',
+    '你不是我的滤镜很厚才好看，是你本来就值得偏爱。',
+    '你出现以后，很多平凡日子都有了名字。',
+    '你认真看向我的时候，我会觉得自己被选中了。',
+    '你可爱起来不是一点点，是会让人想反复收藏的程度。',
+    '你有时候什么都不用说，站在那儿就已经很让人心动了。',
+    '你把开心藏不住的样子，是我见过最明亮的小天气。',
+    '我喜欢你有自己的想法，也喜欢你愿意把想法讲给我听。',
+    '你偶尔委屈巴巴的时候，我只想立刻站到你这边。',
+    '你像一颗小星球，有自己的轨道，也有自己的光。',
+    '你不是需要被定义的人，你本身就很丰富、很特别。',
+    '你让我觉得，陪伴不是负担，是很自然就想做的事。',
+    '你认真吃东西的样子也很可爱，像在给生活盖一个小章。',
+    '你会让我突然想把很多温柔都攒起来给你。',
+    '你的小骄傲、小倔强、小坚持，我都觉得很珍贵。',
+    '你让我明白，心动不是一次性的，是会反复发生的。',
+    '你有一种把人从坏心情里拉出来的能力，轻轻的，但很有效。',
+    '你不需要一直很厉害，你在我这里可以只是宁宁。',
+    '你开心的时候，我会比自己开心还要开心一点。',
+    '你皱眉的时候也很可爱，但我还是更想让你少皱一点。',
+    '你身上有很多我说不完的好，所以我才想慢慢写给你。',
+    '你让我觉得，喜欢不是轰轰烈烈才算数，细水长流也很动人。',
+    '你在我身边的时候，空气都会变得更软一点。',
+    '你偶尔迷糊一下，我就会觉得这个世界也太会安排了。',
+    '你是我想认真偏爱、认真照顾、认真陪很久的人。',
+    '你让我愿意把未来想得更具体一点。',
+    '你值得很多很多爱，也值得被很认真地说好多遍。'
+  ];
+  let index = 0;
+
+  btn.addEventListener('click', () => {
+    index = (index + 1 + Math.floor(Math.random() * (praises.length - 1))) % praises.length;
+    note.textContent = praises[index];
+    cardBurst({ stopPropagation() {}, clientX: window.innerWidth / 2, clientY: note.getBoundingClientRect().top + 20 });
+  });
+}
+
 function initPetals() {
   const canvas = document.getElementById('petals');
   const ctx = canvas.getContext('2d');
@@ -1644,6 +2036,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTimeline();
   renderBlessing();
   renderCards();
+  initPraiseBox();
   initPetals();
   initScrollAnimations();
   initNav();
